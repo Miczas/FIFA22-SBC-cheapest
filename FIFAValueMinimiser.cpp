@@ -1,11 +1,17 @@
 #include <iostream>
+#include <cmath>
+#include <climits>
 
 using namespace std;
-float teamVal(unsigned char* players);
-void findBestTeamConf(float goalVal);
-unsigned int getCost(unsigned char* p);
-void saveTeam(unsigned char* target, unsigned char* team);
 
+// ----- CONFIGURATION -----
+
+#define TEAM_SIZE 11
+#define STARTING 80      // Lowest rating to consider
+#define FINISHING 98     // Highest rating + 1
+#define GOAL 86          // Target team value
+
+// Fix players to specific ratings (0 = unfixed)
 #define FIXED0 0
 #define FIXED1 0
 #define FIXED2 0
@@ -18,145 +24,155 @@ void saveTeam(unsigned char* target, unsigned char* team);
 #define FIXED9 0
 #define FIXED10 0
 
-#define STARTING 80
-#define FINISHING 98
-#define GOAL 86
-
+// Player prices by rating (index = rating)
 unsigned int prices[100] = {};
 
-int main(void)
-{
-	prices[81] = 750;
-	prices[82] = 1000;
-	prices[83] = 1200;
-	prices[84] = 2200;
-	prices[85] = 3600;
-	prices[86] = 4500;
-	prices[87] = 6000;
-	prices[88] = 7400;
-	prices[89] = 11000;
-	prices[90] = 11250;
-	prices[91] = 11500;
-	prices[92] = 12000;
-	prices[93] = 12000;
-	prices[94] = 13000;
-	prices[95] = 15000;
-	prices[96] = 17000;
-	prices[97] = 31000;
-	prices[98] = 94000;
-	prices[99] = 1000000;
-	//unsigned char players[11] = { 86, 87, 87, 87, 88, 88, 88, 88, 88, 88, 89 };
-	//cout << "val of the team is " << teamVal(players) << endl;
-	//cout << "cost is " << getCost(players) << endl;
-	//for (int i = GOAL; i < 88; i++)
-	//{
-	//	findBestTeamConf(i);
-	//}
-	findBestTeamConf(GOAL);
-	
+// ----- FUNCTION DECLARATIONS -----
 
-	
-	system("pause");
+/**
+ * @brief Computes the SBC-style value of a team of 11 players.
+ * @param team Pointer to an array of 11 player ratings.
+ * @return Adjusted average rating with correction factor.
+ */
+float teamVal(const unsigned char* team);
+
+/**
+ * @brief Calculates the total coin cost of a team.
+ * @param team Pointer to an array of 11 player ratings.
+ * @return Total cost in coins.
+ */
+unsigned int getCost(const unsigned char* team);
+
+/**
+ * @brief Saves a team configuration to a target buffer.
+ * @param target Output array where the team will be saved.
+ * @param team Source team to copy.
+ */
+void saveTeam(unsigned char* target, const unsigned char* team);
+
+/**
+ * @brief Finds and prints the cheapest team that meets the goal rating.
+ * @param goalVal Minimum required SBC team value.
+ */
+void findBestTeamConf(float goalVal);
+
+// ----- MAIN FUNCTION -----
+
+int main()
+{
+    // Set prices for each player rating
+    prices[81] = 750;
+    prices[82] = 1000;
+    prices[83] = 1200;
+    prices[84] = 2200;
+    prices[85] = 3600;
+    prices[86] = 4500;
+    prices[87] = 6000;
+    prices[88] = 7400;
+    prices[89] = 11000;
+    prices[90] = 11250;
+    prices[91] = 11500;
+    prices[92] = 12000;
+    prices[93] = 12000;
+    prices[94] = 13000;
+    prices[95] = 15000;
+    prices[96] = 17000;
+    prices[97] = 31000;
+    prices[98] = 94000;
+    prices[99] = 1000000;
+
+    findBestTeamConf(GOAL);
+
+    return 0;
+}
+
+// ----- FUNCTION DEFINITIONS -----
+
+float teamVal(const unsigned char* team)
+{
+    float sum = 0, correction = 0;
+
+    // Calculate average rating
+    for (int i = 0; i < TEAM_SIZE; i++)
+        sum += team[i];
+
+    float avg = sum / TEAM_SIZE;
+
+    // Add correction factor: sum of amounts above average
+    for (int i = 0; i < TEAM_SIZE; i++) {
+        if (team[i] > avg)
+            correction += team[i] - avg;
+    }
+
+    return floor((sum + correction) / TEAM_SIZE);
+}
+
+unsigned int getCost(const unsigned char* team)
+{
+    unsigned int total = 0;
+    for (int i = 0; i < TEAM_SIZE; i++)
+        total += prices[team[i]];
+    return total;
+}
+
+void saveTeam(unsigned char* target, const unsigned char* team)
+{
+    for (int i = 0; i < TEAM_SIZE; i++)
+        target[i] = team[i];
 }
 
 void findBestTeamConf(float goalVal)
 {
-	unsigned char players[11] = {};
-	unsigned int totalCost = UINT32_MAX;
-	unsigned char bestTeam[11] = {};
+    unsigned char team[TEAM_SIZE] = {};
+    unsigned char bestTeam[TEAM_SIZE] = {};
+    unsigned int minCost = UINT_MAX;
 
-	for (int a = STARTING; a < FINISHING; a++)
-	{
-		players[0] = FIXED0 == 0 ? a : FIXED0;
-		for (int b = a; b < FINISHING; b++)
-		{
-			
-			players[1] = FIXED1 == 0 ? b : FIXED1;
-			for (int c = b; c < FINISHING; c++)
-			{
-				
-				players[2] = FIXED2 == 0 ? c : FIXED2;
-				for (int d = c; d < FINISHING; d++)
-				{
-					players[3] = FIXED3 == 0 ? d : FIXED3;
-					for (int e = d; e < FINISHING; e++)
-					{
-						players[4] = FIXED4 == 0 ? e : FIXED4;
-						for (int f = e; f < FINISHING; f++)
-						{							
-							players[5] = FIXED5 == 0 ? f : FIXED5;
-							for (int g = f; g < FINISHING; g++)
-							{
-								players[6] = FIXED6 == 0 ? g : FIXED6;
-								for (int h = g; h < FINISHING; h++)
-								{
-									players[7] = FIXED7 == 0 ? h : FIXED7;
-									
-									for (int i = h; i < FINISHING; i++)
-									{
-										players[8] = FIXED8 == 0 ? i : FIXED8;
-										for (int j = i; j < FINISHING; j++)
-										{
-											players[9] = FIXED9 == 0 ? j : FIXED9;
-											for (int k = j; k < FINISHING; k++)
-											{
-												players[10] = FIXED10 == 0 ? k : FIXED10;
-												if (teamVal(players) >= goalVal)												
-												{
-													if (getCost(players) < totalCost)
-													{
-														totalCost = getCost(players);
-														saveTeam(bestTeam, players);
-													}
-												}
-											}
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	cout << "The cheapest team of value " << goalVal << " consists of following players: " << endl;
-	for (int i = 0; i < 11; i++)
-	{
-		cout << (int)bestTeam[i] << ", ";
-	}
-	cout << "val of the team is " << teamVal(bestTeam) ;
-	cout << ". Cost is " << getCost(bestTeam) << endl << endl;
-}
+    for (int a = STARTING; a < FINISHING; a++) {
+        team[0] = FIXED0 ? FIXED0 : a;
+        for (int b = a; b < FINISHING; b++) {
+            team[1] = FIXED1 ? FIXED1 : b;
+            for (int c = b; c < FINISHING; c++) {
+                team[2] = FIXED2 ? FIXED2 : c;
+                for (int d = c; d < FINISHING; d++) {
+                    team[3] = FIXED3 ? FIXED3 : d;
+                    for (int e = d; e < FINISHING; e++) {
+                        team[4] = FIXED4 ? FIXED4 : e;
+                        for (int f = e; f < FINISHING; f++) {
+                            team[5] = FIXED5 ? FIXED5 : f;
+                            for (int g = f; g < FINISHING; g++) {
+                                team[6] = FIXED6 ? FIXED6 : g;
+                                for (int h = g; h < FINISHING; h++) {
+                                    team[7] = FIXED7 ? FIXED7 : h;
+                                    for (int i = h; i < FINISHING; i++) {
+                                        team[8] = FIXED8 ? FIXED8 : i;
+                                        for (int j = i; j < FINISHING; j++) {
+                                            team[9] = FIXED9 ? FIXED9 : j;
+                                            for (int k = j; k < FINISHING; k++) {
+                                                team[10] = FIXED10 ? FIXED10 : k;
 
-unsigned int getCost(unsigned char* p)
-{
-	return prices[p[0]] + prices[p[1]] + prices[p[2]] + prices[p[3]] + prices[p[4]] + prices[p[5]] + prices[p[6]] + prices[p[7]] + prices[p[8]] + prices[p[9]] + prices[p[10]];
-}
+                                                if (teamVal(team) >= goalVal) {
+                                                    unsigned int cost = getCost(team);
+                                                    if (cost < minCost) {
+                                                        minCost = cost;
+                                                        saveTeam(bestTeam, team);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
 
-void saveTeam(unsigned char* target, unsigned char* team)
-{
-	for (int i = 0; i < 11; i++)
-		target[i] = team[i];
-}
+    // Output the best configuration
+    cout << "The cheapest team of value " << goalVal << " consists of the following players:\n";
+    for (int i = 0; i < TEAM_SIZE; i++)
+        cout << (int)bestTeam[i] << (i < TEAM_SIZE - 1 ? ", " : "\n");
 
-float teamVal(unsigned char* p)
-{
-	float cf = 0;
-	unsigned short int sum = 0;
-	float avg;
-	for (int i = 0; i < 11; i++)
-	{
-		sum += p[i];
-	}
-	avg = sum / (float)11;
-	for (int i = 0; i < 11; i++)
-	{
-		if (p[i]>avg)
-		cf += p[i]-avg;
-	}
-	//cout << "avg is" << avg << endl;
-	//cout << "cf is " << cf << endl;
-	return floor((sum + cf) / 11);
-
+    cout << "Team value: " << teamVal(bestTeam) << ", Total cost: " << getCost(bestTeam) << " coins" << endl;
 }
