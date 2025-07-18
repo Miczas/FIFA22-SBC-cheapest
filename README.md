@@ -41,7 +41,7 @@ You can define the market price for each player rating:
 prices[81] = 750;
 prices[82] = 1000;
 prices[83] = 1200;
-// ...
+```
 
 ## 🙋‍♂️ Contribute
 
