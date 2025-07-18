@@ -1,10 +1,10 @@
-# ⚽ FIFA SBC Squad Optimizer
+# FIFA SBC Squad Optimizer
 
 This is a C++ program that finds the **cheapest possible squad** for completing a **Squad Building Challenge (SBC)** in FIFA. It searches for a team of 11 players whose average rating (with a correction factor) meets or exceeds a target value, using user-defined player prices.
 
 ---
 
-## 🚀 Features
+## Features
 
 - Brute-force search through all valid team configurations
 - Mimics EA’s SBC rating logic using a correction factor
@@ -14,7 +14,7 @@ This is a C++ program that finds the **cheapest possible squad** for completing 
 
 ---
 
-## 🧠 How It Works
+## How It Works
 
 In FIFA, SBC squad rating is **not** calculated as a simple average. Instead, it uses a hidden algorithm that weights higher-rated players more heavily.
 
@@ -27,13 +27,13 @@ It searches for the cheapest team whose adjusted rating meets the goal.
 
 ---
 
-## ⚙ Configuration
+## Configuration
 
 All customization is done in `main.cpp`.
 
 ---
 
-### 💰 Set Player Prices
+### Set Player Prices
 
 You can define the market price for each player rating:
 
@@ -43,7 +43,7 @@ prices[82] = 1000;
 prices[83] = 1200;
 ```
 
-## 🙋‍♂️ Contribute
+## Contribute
 
 Pull requests are welcome! You can help by:
 
